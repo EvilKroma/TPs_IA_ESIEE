@@ -94,11 +94,10 @@ while not termine:
     screen.blit(fond, (0, 0))
     screen.blit(sortie_img, (710, 275))
 
-    #Cadre blanc + icone verte
+    # Cadre blanc autour du bouton actif
     for st, x_pos in tools:
         if outil_actif == st:
             pygame.draw.rect(screen, (255, 255, 255), (x_pos, BUTTON_Y, 48, 62), 3)
-            pygame.draw.circle(screen, (0, 255, 0), (x_pos + 24, 341), 5)
 
     # Spawn des lemings
     if compteur_spawn < 15 and (t_idx + compteur_spawn * 15) % 25 == 0:
