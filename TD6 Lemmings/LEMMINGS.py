@@ -56,12 +56,13 @@ termine = False
 # Fonction centrale pour savoir si un pixel est un sol (pas noir)
 BUTTON_Y = 338  # Début de la barre de boutons (la lampe orange) dans map.png
                 # Le gazon du terrain va jusqu'à y=337, la lampe commence à y=338
+fond.set_clip(pygame.Rect(0, 0, 800, BUTTON_Y))  # Les creusages ne peuvent pas dépasser cette limite
 
 def is_solid(px, py):
     if 0 <= px < 800 and 0 <= py < BUTTON_Y:
         c = fond.get_at((int(px), int(py)))
         return (c[0] + c[1] + c[2]) > 0
-    return False
+    return 0 <= px < 800 and py >= BUTTON_Y
 
 #  Boucle de jeu 
 while not termine:
@@ -166,11 +167,12 @@ while not termine:
                         l['vx'] *= -1; break
         
         elif l['etat'] == CREUSE:
-            if not any(is_solid(x+15, y+dy) for dy in range(35, 60, 5)): l['etat'] = CHUTE
+            if l['y'] + 35 >= BUTTON_Y: l['etat'] = MARCHE
+            elif not any(is_solid(x+15, y+dy) for dy in range(35, 60, 5)): l['etat'] = CHUTE
         elif l['etat'] == BASH:
             if not any(is_solid(x+15+l['vx']*22, y+dy) for dy in range(5, 30, 5)): l['etat'] = MARCHE
         elif l['etat'] == MINE:
-            if not any(is_solid(x+15+l['vx']*12, y+dy) for dy in range(25, 45, 5)): l['etat'] = MARCHE
+            if l['y'] + 30 >= BUTTON_Y or not any(is_solid(x+15+l['vx']*12, y+dy) for dy in range(25, 45, 5)): l['etat'] = MARCHE
         elif l['etat'] == BUILD:
             if l['cnt'] > 12 or is_solid(x+15+l['vx']*12, y+10): l['etat'] = MARCHE
         elif l['etat'] == CLIMB:
@@ -209,6 +211,7 @@ while not termine:
                 l['live'] = False; morts += 1
 
     # (3) Rendu final et Nettoyage
+    screen.set_clip(pygame.Rect(0, 0, 800, BUTTON_Y))
     lemmings_a_garder = []
     for l in lemmings:
         if not l['live']: continue
@@ -226,6 +229,7 @@ while not termine:
                 continue # Retrait immédiat de la liste pour la frame suivante
         lemmings_a_garder.append(l)
     lemmings = lemmings_a_garder
+    screen.set_clip(None)
 
     # Fin de partie
     if sauves + morts == 15 and not lemmings:
