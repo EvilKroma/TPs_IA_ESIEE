@@ -42,7 +42,7 @@ anim = {
     MARCHE: get_sprites(0), CHUTE: get_sprites(1), MORT: get_sprites(2),
     SORTIE: get_sprites(3), STOP: get_sprites(4), CREUSE: get_sprites(5),
     BASH: get_sprites(6), MINE: get_sprites(7), BUILD: get_sprites(8),
-    FLOAT: get_sprites(9), BOMB: get_sprites(10), CLIMB: get_sprites(0)
+    FLOAT: get_sprites(3), BOMB: get_sprites(10), CLIMB: get_sprites(0)
 }
 
 # Variables de contrôle 
