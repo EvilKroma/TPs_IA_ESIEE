@@ -24,7 +24,7 @@ def get_sprites(row_id):
 
 # Initialisation pygame 
 pygame.init()
-screen = pygame.display.set_mode([800, 520])
+screen = pygame.display.set_mode([800, 400])
 pygame.display.set_caption("TP Lemmings - ESIEE")
 font = pygame.font.SysFont("Arial", 18, bold=True)
 font_num   = pygame.font.SysFont("Arial", 38, bold=True)
@@ -39,10 +39,10 @@ CLIMB = 1400
 
 # Dictionnaire pour lier un Etat à sa série d'images
 anim = {
-    MARCHE: get_sprites(0), CHUTE: get_sprites(1), MORT: get_sprites(2),
-    SORTIE: get_sprites(3), STOP: get_sprites(4), CREUSE: get_sprites(5),
-    BASH: get_sprites(6), MINE: get_sprites(7), BUILD: get_sprites(8),
-    FLOAT: get_sprites(3), BOMB: get_sprites(10), CLIMB: get_sprites(0)
+    MARCHE: get_sprites(0), CHUTE: get_sprites(1), CLIMB: get_sprites(2),
+    FLOAT: get_sprites(3), STOP: get_sprites(4), MORT: get_sprites(5),
+    BUILD: get_sprites(6), CREUSE: get_sprites(7), MINE: get_sprites(8),
+    BASH: get_sprites(9), BOMB: get_sprites(10), SORTIE: get_sprites(0)
 }
 
 # Variables de contrôle 
@@ -72,9 +72,9 @@ while not termine:
     screen.blit(fond, (0, 0))
     screen.blit(sortie_img, (710, 275))
     
-    # 9 slots : Blocker(1) Climber(2) Basher(3) Floater(4) Bomber(5) Builder(6) Digger(7) Miner(8) Nuke(9)
-    tools = [(STOP, 192), (CLIMBER_TOOL, 240), (BASH, 288), (FLOAT, 336), (BOMB, 384),
-             (BUILD, 432), (CREUSE, 480), (MINE, 528), (NUKE_TOOL, 576)]
+    # 9 slots selon les icônes de map.png : Blocker Miner Climber Floater Bomber Builder Digger Basher Nuke
+    tools = [(STOP, 192), (MINE, 240), (CLIMBER_TOOL, 288), (FLOAT, 336), (BOMB, 384),
+             (BUILD, 432), (CREUSE, 480), (BASH, 528), (NUKE_TOOL, 576)]
 
     for st, x_pos in tools:
         if outil_actif == st:
@@ -168,7 +168,7 @@ while not termine:
         elif l['etat'] == CREUSE:
             if not any(is_solid(x+15, y+dy) for dy in range(35, 60, 5)): l['etat'] = CHUTE
         elif l['etat'] == BASH:
-            if not any(is_solid(x+15+l['vx']*12, y+dy) for dy in range(5, 30, 5)): l['etat'] = MARCHE
+            if not any(is_solid(x+15+l['vx']*22, y+dy) for dy in range(5, 30, 5)): l['etat'] = MARCHE
         elif l['etat'] == MINE:
             if not any(is_solid(x+15+l['vx']*12, y+dy) for dy in range(25, 45, 5)): l['etat'] = MARCHE
         elif l['etat'] == BUILD:
