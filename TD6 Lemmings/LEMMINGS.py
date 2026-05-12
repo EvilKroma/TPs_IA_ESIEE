@@ -37,18 +37,18 @@ CLIMBER_TOOL, NUKE_TOOL = 1200, 1300
 CLIMB = 1400
 
 anim = {
-    MARCHE: get_sprites(0),  # marche
-    CHUTE:  get_sprites(1),  # chute
-    CLIMB:  get_sprites(2),  # grimpe
-    FLOAT:  get_sprites(3),  # parachute
-    STOP:   get_sprites(4),  # bloqueur
-    MORT:   get_sprites(5),  # mort
-    BUILD:  get_sprites(6),  # escalier
-    CREUSE: get_sprites(7),  # creuse vertical
-    MINE:   get_sprites(8),  # creuse diagonal
-    BASH:   get_sprites(9),  # pioche horizontal
-    BOMB:   get_sprites(10), # explosion
-    SORTIE: get_sprites(0),  # pas d'anim dédiée, on réutilise la marche
+    MARCHE: get_sprites(0),
+    CHUTE:  get_sprites(1),
+    CLIMB:  get_sprites(2),
+    FLOAT:  get_sprites(3),
+    STOP:   get_sprites(4),
+    MORT:   get_sprites(5),
+    BUILD:  get_sprites(6),
+    CREUSE: get_sprites(7),
+    MINE:   get_sprites(8),
+    BASH:   get_sprites(9),
+    BOMB:   get_sprites(10),
+    SORTIE: get_sprites(0),
 }
 
 lemmings = []
@@ -69,6 +69,7 @@ def is_solid(px, py):
     if 0 <= px < 800 and 0 <= py < BUTTON_Y:
         c = fond.get_at((int(px), int(py)))
         return (c[0] + c[1] + c[2]) > 0
+    # En dehors du terrain plancher invisible en bas, vide ailleurs
     return 0 <= px < 800 and py >= BUTTON_Y
 
 # Ordre des compétences
@@ -150,6 +151,7 @@ while not termine:
 
         if l['etat'] in [CHUTE, FLOAT]:
             if is_solid(x + 15, y + 30):  # touche le sol
+                # Mort si chute trop longue sans parachute
                 l['etat'] = MORT if (l['drop'] > 250 and not l['parach']) else MARCHE
                 l['drop'] = 0
             elif l['parach']:
@@ -159,11 +161,11 @@ while not termine:
             if abs(x + 15 - 735) < 15 and abs(y + 25 - 315) < 15:
                 l['etat'] = SORTIE; continue
 
-            # Montée d'une marche
+            # Montée d'une marche : si obstacle bas mais pas haut, on monte
             if is_solid(x + 15 + l['vx'] * 4, y + 25):
                 if not is_solid(x + 15 + l['vx'] * 4, y + 10):
                     l['y'] -= 4
-                else:
+                else:  # mur trop haut : grimpe ou fait demi-tour
                     if l.get('climber', False): l['etat'] = CLIMB
                     else: l['vx'] *= -1
 
@@ -194,9 +196,9 @@ while not termine:
 
         elif l['etat'] == CLIMB:
             wall_x = x + 15 + (14 if l['vx'] > 0 else -14)
-            if is_solid(x + 15, y):          # plafond => retombe
+            if is_solid(x + 15, y):             # plafond => retombe de l'autre côté
                 l['etat'] = CHUTE; l['vx'] *= -1
-            elif not is_solid(wall_x, y + 15):  # sommet atteint
+            elif not is_solid(wall_x, y + 15):  # plus de mur => sommet atteint, reprend la marche
                 l['etat'] = MARCHE
 
     # Actions physiques, déplacements et modifications du décor
@@ -243,7 +245,7 @@ while not termine:
             if l.get('vx', 0) > 0: s = pygame.transform.flip(s, True, False)
             screen.blit(s, (l['x'], l['y']))
 
-            # Fin d'animation, on retire le lemming de la liste
+                    # Attend la fin de l'animation avant de retirer le lemming
             if l['etat'] in [MORT, SORTIE] and (t_idx + l['id']) % len(s_list) == len(s_list) - 1:
                 l['live'] = False
                 if l['etat'] == SORTIE: sauves += 1
@@ -256,7 +258,7 @@ while not termine:
     # Fin
     if sauves + morts == 15 and not lemmings:
         m = "VICTOIRE !" if sauves >= 10 else "RATE..."
-        screen.blit(font.render(m, True, (255, 255, 0)), (350, 200))
+        screen.blit(font.render(m, True, (0, 0, 255)), (350, 200))
 
     clock.tick(25)
     pygame.display.flip()
